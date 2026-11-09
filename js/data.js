@@ -20,10 +20,10 @@ const C = {
 
 /* ── 四类机器人：颜色 / 线型 / 图标 / 名称 / 保真度（PRD §2.4） ───────────── */
 const ROBOT_KIND = {
-  delivery: { col: C.entrance, dash: "", glyph: "▣", name: "配送", en: "Delivery", fid: "完整任务链", width: 0.45, speed: 0.8, task: 7 },
-  clean:    { col: C.clean,    dash: "3 7", glyph: "◇", name: "清洁", en: "Cleaning", fid: "完整任务链", width: 0.55, speed: 0.5, task: 25 },
-  security: { col: C.sec,      dash: "12 8", glyph: "▲", name: "安保", en: "Security", fid: "简化巡游", width: 0.50, speed: 0.6, task: 40 },
-  guide:    { col: C.guide,    dash: "11 5 3 5", glyph: "●", name: "导览", en: "Guide", fid: "简化巡游", width: 0.45, speed: 0.7, task: 12 }
+  delivery: { col: C.entrance, dash: "", glyph: "▣", name: "配送", en: "Delivery", fid: "完整演示", width: 0.45, speed: 0.8, task: 7 },
+  clean:    { col: C.clean,    dash: "3 7", glyph: "◇", name: "清洁", en: "Cleaning", fid: "完整演示", width: 0.55, speed: 0.5, task: 25 },
+  security: { col: C.sec,      dash: "12 8", glyph: "▲", name: "安保", en: "Security", fid: "简化演示", width: 0.50, speed: 0.6, task: 40 },
+  guide:    { col: C.guide,    dash: "11 5 3 5", glyph: "●", name: "导览", en: "Guide", fid: "简化演示", width: 0.45, speed: 0.7, task: 12 }
 };
 
 /* ── 冲突类型（PRD §7.2） ──────────────────────────────────────────────── */
@@ -33,9 +33,9 @@ const CONFLICT_TYPE = {
   "C3": { name: "设施冲突", en: "Facility", rule: "门口 / 电梯口排队 > 3 人，或等待 > 20s", fix: ["分流", "增开入口", "调整任务时刻"] }
 };
 const SEV = {
-  high: { col: C.high, name: "高", w: 3, r: 14 },
-  mid:  { col: C.mid,  name: "中", w: 2, r: 12 },
-  low:  { col: C.low,  name: "低", w: 1, r: 10 }
+  high: { col: C.high, name: "很堵", w: 3, r: 14 },
+  mid:  { col: C.mid,  name: "有点堵", w: 2, r: 12 },
+  low:  { col: C.low,  name: "还好", w: 1, r: 10 }
 };
 
 /* ── 8 个时段（PRD §2.1，唯一时段表） ──────────────────────────────────── */

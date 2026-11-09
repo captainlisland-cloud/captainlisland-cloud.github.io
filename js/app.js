@@ -115,7 +115,7 @@ function renderTop() {
     <div class="seg"><span class="lb">视图</span>${vw}</div>
   </div>
   <div class="acts">
-    <span class="badge-sim" title="V1 为离线情景模拟器：所有位置与人数均为模拟值，不接真实机器人数据">模拟值</span>
+    <span class="badge-sim" title="这里的位置和人数都是模拟出来的，不是真实监控数据">模拟数据</span>
     <button class="btn ${S.edit ? "on" : ""}" data-act="edit">编辑</button>
     <button class="btn ${S.drawer ? "on" : ""}" data-act="drawer">参数</button>
     <div class="morewrap"><button class="btn ${S.more ? "on" : ""}" data-act="more">⋯</button>${menu}</div>
@@ -134,29 +134,29 @@ function renderLeft() {
       <span class="tg ${S.kinds[k] ? "tg-on" : ""}"></span></button>`;
   }).join("");
 
-  const LAY = [["flow", "人流热度与方向"], ["research", "研究层 · 路线（示意）/ 候停点"], ["conflicts", "冲突点"],
-               ["doors", "门（待确认）"], ["docks", "候停 / 停靠点"], ["zones", "分区标注"], ["proposal", "提案元素（B）"]];
+  const LAY = [["flow", "哪里人最多"], ["research", "路线与停靠点（示意）"], ["conflicts", "冲突点 ①②③"],
+               ["doors", "门 · 宽窄待测"], ["docks", "机器人停靠点"], ["zones", "区域名字"], ["proposal", "B 方案新加的东西"]];
   const lays = LAY.map(([k, t]) => `<button class="sw ${S.layers[k] ? "on" : ""}" data-act="layer" data-v="${k}">
       <span class="nm">${t}</span><span class="tg ${S.layers[k] ? "tg-on" : ""}"></span></button>`).join("");
 
   const rules = RULES.map(r => `<li><b>${r[0]}</b><span>${esc(r[1])}</span></li>`).join("");
 
   $("left").innerHTML = `
-  <div class="sec-h">机器人四类开关 <em>Robot layers · 保真度已标注</em></div>${kinds}
-  <div class="sec-h" style="margin-top:6px">底图 <em>Base map · 可随时切换</em></div>
+  <div class="sec-h">想看哪几台机器人？ <em>点一下就能单独开关</em></div>${kinds}
+  <div class="sec-h" style="margin-top:6px">地图样式 <em>点一下就能换</em></div>
   <button class="sw ${S.basemap === "simple" ? "on" : ""}" data-act="basemap" data-v="simple">
-    <span class="nm">简化示意 · 墙/柱/门窗</span><span class="tg ${S.basemap === "simple" ? "tg-on" : ""}"></span></button>
+    <span class="nm">干净版 · 只有墙和门窗</span><span class="tg ${S.basemap === "simple" ? "tg-on" : ""}"></span></button>
   <button class="sw ${S.basemap === "cad" ? "on" : ""}" data-act="basemap" data-v="cad">
-    <span class="nm">CAD 原图 · 含尺寸线</span><span class="tg ${S.basemap === "cad" ? "tg-on" : ""}"></span></button>
-  <div class="sec-h" style="margin-top:6px">图层开关 <em>Map layers</em></div>${lays}
-  <div class="sec-h" style="margin-top:6px">通行规则速查 <em>Hard rules · PRD §7.1</em></div>
+    <span class="nm">原始版 · 带尺寸线</span><span class="tg ${S.basemap === "cad" ? "tg-on" : ""}"></span></button>
+  <div class="sec-h" style="margin-top:6px">图上想看什么？ <em>不想看的可以关掉</em></div>${lays}
+  <div class="sec-h" style="margin-top:6px">三条不能破的规则 <em>设计时都要守住</em></div>
   <ul class="rules">${rules}</ul>
   <div class="note">底图来自「Y1 to Y3 Floor Plan 20260821」Building 2 CAD。
     CAD 门位可辨、净宽不可辨 → 全部门标「待确认」，通行判定待实测门表。</div>
   <div class="note" style="color:#1D5C7A">简化底图来自 3D 模型 1.2m 水平剖面，已配准到 CAD 坐标系，
     只保留墙 / 柱 / 门窗；<b>室内隔墙较 CAD 有所合并，属示意</b>。精确位置判定请切「CAD 原图」。</div>
   <div class="note" style="color:#8A5A12">机器人路线已按「尽量避开墙体」重算，但仍是<b>示意</b>：
-    PRD §10.1 的走廊中心线路网尚未建立，不能当作真实可通行路径引用。</div>
+    真正的走廊路网还没建好，别把它当成真实能走的路线。</div>
   ${S.edit ? `<div class="note" style="color:#1D5C7A;background:#EAF2F6;border-color:#C9DEE9">
     编辑模式已开启：可直接拖动机器人 / 冲突点 / 候停点；点对象后在右栏改属性。</div>` : ""}`;
 }
@@ -171,12 +171,12 @@ function mapOverlays(floorId, variant) {
     ["清洁 ◇", `<i style="border-top-color:${C.clean};border-top-style:dotted"></i>`],
     ["安保 ▲", `<i style="border-top-color:${C.sec};border-top-style:dashed"></i>`],
     ["导览 ●", `<i style="border-top-color:${C.guide};border-top-style:dashdot"></i>`],
-    ["冲突 高", `<u style="background:${C.high}"></u>`],
-    ["中", `<u style="background:${C.mid}"></u>`],
-    ["低", `<u style="border:2px solid ${C.low}"></u>`],
+    ["冲突 · 很堵", `<u style="background:${C.high}"></u>`],
+    ["有点堵", `<u style="background:${C.mid}"></u>`],
+    ["还好", `<u style="border:2px solid ${C.low}"></u>`],
     ["待确认", `<u style="background:repeating-linear-gradient(45deg,${C.tbc} 0 2px,#fff 2px 4px)"></u>`],
     ["提案 PROPOSED", `<i style="border-top-color:${C.sec};border-top-style:dashed"></i>`],
-    ["⚠ 机器人路线＝示意", `<u style="background:#FDF3E3;border:1px solid #F0DCB8"></u>`]
+    ["⚠ 路线只是示意", `<u style="background:#FDF3E3;border:1px solid #F0DCB8"></u>`]
   ].map(x => `<span class="lg">${x[1]}${x[0]}</span>`).join("");
 
   const sl = slot(S.slot);
@@ -193,8 +193,8 @@ function mapOverlays(floorId, variant) {
     <button data-act="zoom" data-v="in" title="放大（放大后可滚动查看）">＋</button>
     <button data-act="zoom" data-v="fit" title="恢复适应窗口">适应</button>
   </div>
-  <div class="tbc">? CAD 门位可辨、净宽不可辨 → 全部门标「待确认」；比例 / 指北待校准
-    <br>⚠ 机器人路线为<b>示意</b>，尚未接入走廊中心线路网，不代表真实可通行路径</div>
+  <div class="tbc">? 门有多宽还没量过，先标「待确认」；比例和指北也待校准
+    <br>⚠ 机器人走的是<b>示意路线</b>，不是真实可通行路径</div>
   <div class="legend">${lg}</div>
   <div class="scale"><span>比例 待校准</span><div class="compass"><b>N</b></div></div>
   ${S.edit ? editBar() : ""}`;
@@ -290,12 +290,12 @@ function cardSlot(sl) {
   const idx = conflictIndex(S.slot, S.variant);
   const hot = hi.length ? hi.map(c => c.where).join("、") : "无高风险点";
   return `<div class="card">
-    <div class="ch">当前时段 <span class="tag">${sl.id} · ${sl.start}–${sl.end}</span></div>
-    <div class="kv"><span class="k">时段</span><span class="v"><b>${sl.name}</b> ${sl.en} · ${sl.dur} min</span></div>
-    <div class="kv"><span class="k">人流特征</span><span class="v">${esc(sl.flow)}</span></div>
-    <div class="kv"><span class="k">机器人主线</span><span class="v">${esc(sl.robot)}</span></div>
-    <div class="kv"><span class="k">高风险点</span><span class="v">${hi.length} 处 · ${esc(hot)}</span></div>
-    <div class="kv"><span class="k">冲突指数</span><span class="v">${idx.toFixed(2)} <span style="color:#8A9AA5">双层合计 · 模拟</span></span></div>
+    <div class="ch">现在这一刻 <span class="tag">${sl.id} · ${sl.start}–${sl.end}</span></div>
+    <div class="kv"><span class="k">现在</span><span class="v"><b>${sl.name}</b> ${sl.en} · ${sl.dur} min</span></div>
+    <div class="kv"><span class="k">人在干嘛</span><span class="v">${esc(sl.flow)}</span></div>
+    <div class="kv"><span class="k">机器人</span><span class="v">${esc(sl.robot)}</span></div>
+    <div class="kv"><span class="k">最堵的地方</span><span class="v">${hi.length} 处 · ${esc(hot)}</span></div>
+    <div class="kv"><span class="k">拥挤分数</span><span class="v">${idx.toFixed(2)} <span style="color:#8A9AA5">1F+2F 合计 · 模拟值</span></span></div>
   </div>`;
 }
 
@@ -305,15 +305,15 @@ function cardConflictList() {
     const S2 = SEV[c.sev];
     return `<button class="crow" data-act="pick-conflict" data-v="${c.n}">
       <span class="no" style="background:${S2.col}">${c.n}</span>
-      <span class="tp">${c.type} · ${esc(c.where)}</span>
+      <span class="tp">${esc(c.where)}</span>
       <span class="sv sev-${c.sev}">${S2.name}</span></button>`;
   }).join("") : `<div class="txt" style="padding:6px 0">本时段本层无冲突点。</div>`;
   return `<div class="card">
-    <div class="ch">冲突清单 <span class="tag">${cfs.length} 处 · ${S.floor} · ${S.variant}</span></div>
+    <div class="ch">要留意的地方 <span class="tag">${cfs.length} 处 · 点开看原因</span></div>
     ${rows}
     ${S.variant === "A" && S.floor === "2F" ? `<div class="warn" style="margin-top:8px">
-      现状 A：楼内只有主楼梯与两部人用电梯，没有机器人专用竖向通道 → 机器人活动范围 = 1F。
-      这不是显示异常，是结论。</div>` : ""}
+      现状 A 里，机器人没有能上楼的通道，所以 2 楼一台都没有。
+      这不是加载失败，正是这一课要发现的结论。</div>` : ""}
   </div>`;
 }
 
@@ -324,15 +324,15 @@ function cardRobot(id) {
   const states = ["待机", "任务中", "巡游中", "避让", "充电", "故障"];
   const st = states.map(s => `<span class="chip2 ${rob.state === s ? "on" : ""}" ${S.edit ? `data-act="set-state" data-v="${s}"` : ""}>${s}</span>`).join("");
   return `<div class="card">
-    <div class="ch"><span style="color:${K.col}">${K.glyph}</span> ${rob.id} · ${K.name}
+    <div class="ch"><span style="color:${K.col}">${K.glyph}</span> ${K.name}机器人
       <span class="tag">${K.fid}</span></div>
-    <div class="kv"><span class="k">类型</span><span class="v">${K.name} ${K.en} · 保真度 ${K.fid}</span></div>
+    <div class="kv"><span class="k">它是干嘛的</span><span class="v">${K.name} · ${K.fid}</span></div>
     <div class="kv"><span class="k">状态</span><span class="v">${esc(rob.state)}</span></div>
-    <div class="kv"><span class="k">速度 / 尺寸</span><span class="v">${K.speed} m/s · 宽 ${K.width} m <span style="color:#8A9AA5">假设</span></span></div>
-    <div class="kv"><span class="k">任务时长</span><span class="v">${K.task} min · 单程（假设）</span></div>
-    <div class="kv"><span class="k">任务链</span><span class="v">${(rob.chain || []).join(" → ")}</span></div>
-    <div class="kv"><span class="k">在场时段</span><span class="v">${rob.slots.join(" ")}</span></div>
-    <div class="kv"><span class="k">路线</span><span class="v">示意路径 · <span style="color:#8A5A12">未接入走廊路网</span></span></div>
+    <div class="kv"><span class="k">速度 / 宽度</span><span class="v">${K.speed} m/s · 宽 ${K.width} m <span style="color:#8A9AA5">假设</span></span></div>
+    <div class="kv"><span class="k">一趟要多久</span><span class="v">${K.task} 分钟 · 单程（假设值）</span></div>
+    <div class="kv"><span class="k">它要做的事</span><span class="v">${(rob.chain || []).join(" → ")}</span></div>
+    <div class="kv"><span class="k">出现时段</span><span class="v">${rob.slots.join(" ")}</span></div>
+    <div class="kv"><span class="k">走哪条路</span><span class="v">只是示意 · <span style="color:#8A5A12">不是真实路线</span></span></div>
     ${S.edit ? `<div class="state">${st}</div>${robotForm(rob)}` : `<div class="state">${st}</div>`}
   </div>`;
 }
@@ -343,15 +343,16 @@ function cardConflict(n) {
   const T = CONFLICT_TYPE[cf.type], S2 = SEV[cf.sev];
   const fix = (cf.fix || T.fix).map(f => `<div class="act">→ <b>${esc(f)}</b></div>`).join("");
   return `<div class="card hl">
-    <div class="ch">${cf.n} ${T.name}
-      <span class="sv sev-${cf.sev}" style="font-size:11px">${S2.name}严重度</span></div>
-    <div class="kv"><span class="k">位置</span><span class="v">${esc(cf.where)} · (${cf.x}, ${cf.y})</span></div>
-    <div class="kv"><span class="k">持续</span><span class="v">${cf.dur} s（阈值 ${getParam("conflictDur")} s）</span></div>
-    <div class="kv"><span class="k">判定</span><span class="v">${esc(T.rule)}</span></div>
-    <div class="kv"><span class="k">涉及</span><span class="v">${cf.slots.join(" ")}</span></div>
-    <div class="warn" style="margin-top:8px"><b>原因</b>　${esc(cf.why)}</div>
-    <div class="txt" style="margin-top:8px;font-weight:600">建议动作（可执行）</div>
+    <div class="ch">${cf.n} ${esc(cf.where)}
+      <span class="sv sev-${cf.sev}" style="font-size:11px">${S2.name}</span></div>
+    <div class="kv"><span class="k">在哪儿</span><span class="v">${esc(cf.where)}</span></div>
+    <div class="kv"><span class="k">堵多久</span><span class="v">${cf.dur} 秒</span></div>
+    <div class="kv"><span class="k">怎么算冲突</span><span class="v">${esc(T.rule)}</span></div>
+    <div class="kv"><span class="k">哪些时段</span><span class="v">${cf.slots.join(" ")}</span></div>
+    <div class="warn" style="margin-top:8px"><b>发生了什么</b>　${esc(cf.why)}</div>
+    <div class="txt" style="margin-top:8px;font-weight:600">如果是你，会怎么改？</div>
     ${fix}
+    <div class="txt" style="margin-top:9px">想一想：这 3 条里，哪一条最不影响上课？</div>
     ${S.edit ? conflictForm(cf) : ""}
   </div>`;
 }
@@ -362,13 +363,13 @@ function cardDoor(id) {
   const rows = doorTable(dr).map(r => `<div class="kv"><span class="k" style="color:${r.ok ? "#2E7D5B" : C.high}">
     ${r.glyph} ${r.name}</span><span class="v">${r.ok ? "可通行 · " : "不可通行 · "}${esc(r.why)}</span></div>`).join("");
   return `<div class="card doorcard">
-    <div class="ch">门 ${dr.id} <span class="tag">${esc(dr.type)}</span></div>
-    <div class="kv"><span class="k">连接</span><span class="v">${esc(dr.between)}</span></div>
-    <div class="kv"><span class="k">净宽</span><span class="v">${dr.w ? dr.w + " m" : "—"} <span style="color:#8A9AA5">${esc(dr.conf)}</span></span></div>
-    <div class="kv"><span class="k">常闭</span><span class="v">${dr.closed ? "是" : "否"}</span></div>
+    <div class="ch">这扇门 <span class="tag">${esc(dr.type)}</span></div>
+    <div class="kv"><span class="k">连着哪儿</span><span class="v">${esc(dr.between)}</span></div>
+    <div class="kv"><span class="k">门有多宽</span><span class="v">${dr.w ? dr.w + " m" : "—"} <span style="color:#8A9AA5">${esc(dr.conf)}</span></span></div>
+    <div class="kv"><span class="k">平时关着吗</span><span class="v">${dr.closed ? "是" : "否"}</span></div>
     ${rows}
-    <div class="no">? 门位 / 净宽未实测 → 通行判定仅供参考。
-      判定式：净宽 − 2×${getParam("clearance")}m &lt; 机器人宽度 → 不可通行（PRD §7.1 S2）</div>
+    <div class="no">? 门的宽度还没实测，这里的判断只作参考。
+      判断方法：门宽 − 两边各留 ${getParam("clearance")}m &lt; 机器人宽度 → 就过不去</div>
     ${S.edit ? doorForm(dr) : ""}
   </div>`;
 }
@@ -389,7 +390,7 @@ function cardPov(id) {
   const p = POVS.find(x => x.id === id);
   if (!p) return "";
   return `<div class="card">
-    <div class="ch">POV 视点 <span class="tag">${p.id} · 固定视点</span></div>
+    <div class="ch">站在这里看 <span class="tag">${p.id} · 固定观察点</span></div>
     <div class="pov">${povSVG(p, 272)}
       <div class="cap">${p.id} ${esc(p.name)} · 预渲染示意，非现场照片</div></div>
     <div class="kv"><span class="k">看什么</span><span class="v">${esc(p.see)}</span></div>
@@ -402,10 +403,10 @@ function cardPovPanel() {
   if (!p) return "";
   if (S.sel && S.sel.type === "pov") return "";
   return `<div class="card">
-    <div class="ch">POV 视角 <span class="tag">最近视点 ${p.id}</span></div>
+    <div class="ch">最近的观察点 <span class="tag">${p.id}</span></div>
     <div class="pov">${povSVG(p, 272)}
       <div class="cap">${p.id} ${esc(p.name)} · 预渲染示意，非现场照片</div></div>
-    <div class="txt" style="margin-top:7px;font-size:11px;color:#8A9AA5">点地图空白处 → 弹出最近视点静帧</div>
+    <div class="txt" style="margin-top:7px;font-size:11px;color:#8A9AA5">点地图空白处，看看离你最近的地方长什么样</div>
   </div>`;
 }
 
@@ -502,15 +503,15 @@ function renderTimeline() {
 
   const sl = slot(S.slot);
   const side = `<div class="card">
-      <div class="ch">时段详情 <span class="tag">${sl.id}</span></div>
-      <div class="kv"><span class="k">时段</span><span class="v"><b>${sl.name}</b> · ${sl.start}–${sl.end} · ${sl.dur} min</span></div>
-      <div class="kv"><span class="k">人流特征</span><span class="v">${esc(sl.flow)}</span></div>
-      <div class="kv"><span class="k">机器人主线</span><span class="v">${esc(sl.robot)}</span></div>
-      <div class="kv"><span class="k">冲突指数</span><span class="v">${conflictIndex(S.slot, S.variant).toFixed(2)}</span></div>
-      <div class="kv"><span class="k">峰值密度</span><span class="v" style="color:${sl.peak[S.variant] > 1.5 ? C.high : "#33454F"}">${sl.peak[S.variant]} 人/m²</span></div>
+      <div class="ch">这段时间 <span class="tag">${sl.id}</span></div>
+      <div class="kv"><span class="k">时间</span><span class="v"><b>${sl.name}</b> · ${sl.start}–${sl.end} · ${sl.dur} 分钟</span></div>
+      <div class="kv"><span class="k">人在干嘛</span><span class="v">${esc(sl.flow)}</span></div>
+      <div class="kv"><span class="k">机器人</span><span class="v">${esc(sl.robot)}</span></div>
+      <div class="kv"><span class="k">拥挤分数</span><span class="v">${conflictIndex(S.slot, S.variant).toFixed(2)}</span></div>
+      <div class="kv"><span class="k">最挤的时候</span><span class="v" style="color:${sl.peak[S.variant] > 1.5 ? C.high : "#33454F"}">${sl.peak[S.variant]} 人/m²</span></div>
     </div>
-    <div class="card"><div class="ch">怎么用这张表</div>
-      <div class="txt">横着看 = 某一类机器人在一天里什么时候忙；竖着看 = 某个时段有几类机器人在场。
+    <div class="card"><div class="ch">这张表怎么看</div>
+      <div class="txt">横着看：某一类机器人一整天什么时候在忙；竖着看：某个时段一共有几类机器人在场。
       点任意格子跳到该时段。</div></div>`;
 
   $("body").innerHTML = `<div class="tl">
@@ -548,32 +549,32 @@ function renderCompare() {
   }).join("");
 
   const dI = delta(iA, iB), dP = delta(pA, pB);
-  const concl = `B 让 2F 变得可达（大厅→2F ${tA[2] == null ? "不可达" : tA[2] + "s"} → ${tB[2]}s），
-    双层合计冲突指数 ${iA.toFixed(2)} → ${iB.toFixed(2)}（${dI < 0 ? "降" : "升"} ${Math.abs(dI * 100).toFixed(0)}%）；
-    但 1 处高风险从餐厅门口转移到廊桥口——收益是可达性，代价是新增了一处廊桥人机冲突。`;
+  const concl = `B 方案让机器人终于能上 2 楼（大厅→2F：过不去 → ${tB[2]} 秒），
+    拥挤分数从 ${iA.toFixed(2)} 变成 ${iB.toFixed(2)}（${dI < 0 ? "降" : "升"} ${Math.abs(dI * 100).toFixed(0)}%）；
+    但最堵的地方从餐厅门口挪到了廊桥口。好处是能上楼，代价是新添了一个堵点。`;
 
   $("body").innerHTML = `<div class="cmp">
-    <div class="cmp-h"><h2>对比视图 · 现状 A vs 提案 B</h2>
-      <span class="lock">对比时只改被比较的那一项，其余参数锁定</span>
+    <div class="cmp-h"><h2>比一比：现状 A 和提案 B</h2>
+      <span class="lock">只换方案，其它条件都一样，比起来才公平</span>
       <div class="seg" style="margin-left:auto"><span class="lb">楼层</span>
         ${["1F", "2F"].map(f => `<button class="sg ${S.floor === f ? "on" : ""}" data-act="floor" data-v="${f}">${f}</button>`).join("")}
       </div></div>
     <div class="cmp-maps">${maps}</div>
     <div class="cmp-metrics">
-      <div class="mc"><h3>冲突指数 <em>Σ(点×权重) ÷ 时长</em></h3>
+      <div class="mc"><h3>拥挤分数 <em>按堵点和堵的时间算</em></h3>
         <div class="num">${iA.toFixed(2)} <small>→</small> ${iB.toFixed(2)}</div>
         <div class="d">${sign(dI, true)} <span style="color:#8A9AA5;font-weight:400">相对 A</span></div>
-        <div class="foot">权重 高 ${getParam("wHigh")} / 中 ${getParam("wMid")} / 低 ${getParam("wLow")} · 双层合计 · 模拟</div></div>
-      <div class="mc"><h3>通行代价 <em>3 组固定 OD · 秒</em></h3>
+        <div class="foot">很堵 ${getParam("wHigh")} / 有点堵 ${getParam("wMid")} / 还好 ${getParam("wLow")} · 两层合计 · 模拟值</div></div>
+      <div class="mc"><h3>走到 2 楼要多久 <em>3 条固定路线 · 秒</em></h3>
         <div class="bars">${bars}</div>
-        <div class="foot">OD 对固定，不随用户改动 · 灰=A / 蓝=B</div></div>
-      <div class="mc"><h3>峰值密度 <em>最窄通道 · 人/m²</em></h3>
+        <div class="foot">路线固定不变 · 灰=A / 蓝=B</div></div>
+      <div class="mc"><h3>最挤的时候 <em>最窄的通道 · 人/m²</em></h3>
         <div class="num"><span style="color:${pA > 1.5 ? C.high : "inherit"}">${pA}</span>
           <small>→</small> <span style="color:${pB > 1.5 ? C.high : "inherit"}">${pB}</span></div>
         <div class="d">${sign(dP, true)} <span style="color:#8A9AA5;font-weight:400">&gt; 1.5 人/m² 标红</span></div>
-        <div class="foot">按 §8.2 假设人流推算 · 非实测</div></div>
+        <div class="foot">按假设人数推算 · 不是实测</div></div>
     </div>
-    <div class="concl"><b>结论</b><span>${concl}</span></div>
+    <div class="concl"><b>一句话结论</b><span>${concl}</span></div>
   </div>`;
 
   ["A", "B"].forEach(v => {
@@ -599,7 +600,7 @@ function renderDrawer() {
       <td class="n"><input type="number" step="any" value="${p.value}" data-pk="${p.key}"></td>
       <td class="n" style="color:#8A9AA5">${esc(p.unit)}</td>
       <td><span class="src s-${esc(p.source)}">${esc(p.source)}</span></td></tr>`).join("");
-  d.innerHTML = `<h3>参数抽屉 <span class="tag" style="font-size:11px;color:#8A9AA5;font-weight:400">PRD §8.2</span>
+  d.innerHTML = `<h3>改数字看变化 <span class="tag" style="font-size:11px;color:#8A9AA5;font-weight:400">假设值</span>
       <button class="btn" style="margin-left:auto" data-act="drawer">关闭</button></h3>
     <div class="rd">全部数值均为假设值 / 文献值，改动只在本沙盘内生效，不会下发到任何真实机器人。</div>
     <div class="dbody"><table><thead><tr><th>参数</th><th style="text-align:right">值</th><th></th><th>来源</th></tr></thead>
@@ -808,14 +809,14 @@ function showHelp() {
   const box = document.createElement("div");
   box.id = "help"; box.className = "help";
   box.innerHTML = `<div class="helpbox">
-    <h3>使用说明 / 数据来源
+    <h3>完整说明 / 数据来源（老师版）
       <button class="btn" style="margin-left:auto" id="helpclose">关闭</button></h3>
     <div class="helpbody">
-      <h4>三步闭环（PRD §3.1）</h4>
+      <h4>三步怎么用（PRD §3.1）</h4>
       <ol>
         <li><b>选时段</b>：点顶栏 T1–T8 胶囊，或拖底部时间轴游标；空格播放，← → 步进。</li>
         <li><b>看冲突</b>：点地图上的 ①②③ 冲突点 → 右栏出「类型 / 严重度 / 持续 / 原因 / 3 条建议」；
-          点机器人看完整路线与任务链；点门看通行判定；点空白看最近 POV 视点。</li>
+          点机器人看它走哪条路、要做哪些事；点门看它过不过得去；点空白处看最近的现场视角。</li>
         <li><b>改方案</b>：顶栏切 A / B，或点「对比」看双地图 + 3 个指标 + Δ。</li>
       </ol>
       <h4>怎么改数据（这就是「可以编辑」的部分）</h4>
@@ -853,27 +854,28 @@ function showIntro() {
   box.id = "intro"; box.className = "intro";
   box.innerHTML = `<div class="introbox">
     <div class="ih">
-      <h3>30 秒上手：这是一台「人机交通模拟器」</h3>
-      <p>2 号楼 1F / 2F 的一天。图上所有位置与人数都是<b>模拟值</b>，不是真实监控数据。</p>
+      <h3>今天，你来当一次校园规划师</h3>
+      <p>2 号楼就那么几条走廊，人和机器人得一起用。找出哪里会堵，再试试能不能把它改好。</p>
     </div>
     <div class="steps">
-      <div class="step"><div class="n">1</div><h4>选一个时间</h4>
-        <ol><li>点顶栏 <b>T1–T8</b> 胶囊（<b>T5 午餐</b>最挤，建议先看它）</li>
-        <li>或点底部 <b>播放</b>，看一整天怎么变化</li>
-        <li>键盘 <kbd>空格</kbd> 播放 / <kbd>←</kbd><kbd>→</kbd> 步进 / <kbd>1</kbd><kbd>2</kbd> 换楼层</li></ol></div>
-      <div class="step"><div class="n">2</div><h4>找一个冲突点</h4>
-        <ol><li>图上的 <b>① ② ③</b> 就是人机冲突点，颜色 红=高 / 橙=中 / 灰=低</li>
-        <li>点它 → 右栏出现「为什么 + 3 条怎么改」</li>
-        <li>点机器人看它走哪儿；点门看它过不过得去；点空白处看现场视角</li></ol></div>
-      <div class="step"><div class="n">3</div><h4>比一比，给结论</h4>
-        <ol><li>顶栏 <b>现状 A / 提案 B</b> 切着看</li>
-        <li>点 <b>对比</b>：左右两张图 + 3 个数字 + Δ</li>
-        <li>记住一句：加了中庭那部机器人梯，2 楼终于能上去，但廊桥口会新出现一处高风险</li></ol></div>
+      <div class="step"><div class="n">1</div><h4>先挑一个时间</h4>
+        <ol><li>点顶栏 <b>T1–T8</b>；不知道选哪个，就从 <b>T5 午餐</b> 开始，那时最挤</li>
+        <li>或者点底部 <b>播放</b>，看一整天怎么变化</li>
+        <li>快捷键 <kbd>空格</kbd> 播放 / <kbd>←</kbd><kbd>→</kbd> 换时间 / <kbd>1</kbd><kbd>2</kbd> 换楼层</li></ol></div>
+      <div class="step"><div class="n">2</div><h4>找一处堵点</h4>
+        <ol><li>图上的 <b>① ② ③</b> 都能点：红=很堵，橙=有点堵，灰=还好</li>
+        <li>点开看「发生了什么」和 3 条改法</li>
+        <li>也能点机器人看它走哪儿、点门看它过不过得去</li></ol></div>
+      <div class="step"><div class="n">3</div><h4>试试你的办法</h4>
+        <ol><li>顶栏切 <b>现状 A / 提案 B</b>，看图上怎么变</li>
+        <li>点 <b>对比</b>：两张图 + 3 个数字，一眼看出差多少</li>
+        <li>留个心眼：能让机器人上 2 楼的办法，也可能把堵点挪到别处</li></ol></div>
     </div>
+    <div style="padding:4px 24px 0;font-size:12px;color:#8A9AA5">图上标的是模拟数据，不是监控画面。看不清就按地图右边的 ＋ 放大，点错了按 Esc。</div>
     <div class="if">
-      <label><input type="checkbox" id="introskip" checked> 下次打开不再显示</label>
-      <button class="btn" data-act="help">看完整说明 / 数据来源</button>
-      <button class="btn primary" style="margin-left:auto" id="introgo">开始探索 →</button>
+      <label><input type="checkbox" id="introskip" checked> 下次不再显示</label>
+      <button class="btn" data-act="help">看完整说明</button>
+      <button class="btn primary" style="margin-left:auto" id="introgo">开始找问题 →</button>
     </div>
   </div>`;
   document.body.appendChild(box);
