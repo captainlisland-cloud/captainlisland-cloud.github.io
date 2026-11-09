@@ -143,11 +143,18 @@ function renderLeft() {
 
   $("left").innerHTML = `
   <div class="sec-h">机器人四类开关 <em>Robot layers · 保真度已标注</em></div>${kinds}
+  <div class="sec-h" style="margin-top:6px">底图 <em>Base map · 可随时切换</em></div>
+  <button class="sw ${S.basemap === "simple" ? "on" : ""}" data-act="basemap" data-v="simple">
+    <span class="nm">简化示意 · 墙/柱/门窗</span><span class="tg ${S.basemap === "simple" ? "tg-on" : ""}"></span></button>
+  <button class="sw ${S.basemap === "cad" ? "on" : ""}" data-act="basemap" data-v="cad">
+    <span class="nm">CAD 原图 · 含尺寸线</span><span class="tg ${S.basemap === "cad" ? "tg-on" : ""}"></span></button>
   <div class="sec-h" style="margin-top:6px">图层开关 <em>Map layers</em></div>${lays}
   <div class="sec-h" style="margin-top:6px">通行规则速查 <em>Hard rules · PRD §7.1</em></div>
   <ul class="rules">${rules}</ul>
   <div class="note">底图来自「Y1 to Y3 Floor Plan 20260821」Building 2 CAD。
     CAD 门位可辨、净宽不可辨 → 全部门标「待确认」，通行判定待实测门表。</div>
+  <div class="note" style="color:#1D5C7A">简化底图来自 3D 模型 1.2m 水平剖面，已配准到 CAD 坐标系，
+    只保留墙 / 柱 / 门窗；<b>室内隔墙较 CAD 有所合并，属示意</b>。精确位置判定请切「CAD 原图」。</div>
   <div class="note" style="color:#8A5A12">机器人路线已按「尽量避开墙体」重算，但仍是<b>示意</b>：
     PRD §10.1 的走廊中心线路网尚未建立，不能当作真实可通行路径引用。</div>
   ${S.edit ? `<div class="note" style="color:#1D5C7A;background:#EAF2F6;border-color:#C9DEE9">
@@ -175,7 +182,8 @@ function mapOverlays(floorId, variant) {
   const sl = slot(S.slot);
   const chips = [`<span class="chip"><b>${S.floor}</b> ${esc(FLOORS[S.floor].name)}</span>`,
                  `<span class="chip"><b>${sl.id}</b> ${sl.name} · ${sl.start}–${sl.end}</span>`,
-                 `<span class="chip"><b>${S.variant}</b> ${S.variant === "A" ? "现状基线" : "提案"}</span>`].join("");
+                 `<span class="chip"><b>${S.variant}</b> ${S.variant === "A" ? "现状基线" : "提案"}</span>`,
+                 `<span class="chip"><b>底图</b> ${S.basemap === "simple" ? "简化示意" : "CAD 原图"}</span>`].join("");
 
   const z = Math.round(S.zoom * 100);
   return `<div class="maptag">${chips}</div>
@@ -657,6 +665,7 @@ document.addEventListener("click", e => {
   else if (a === "right") { S.rightOpen = !S.rightOpen; }
   else if (a === "kind") { S.kinds[v] = !S.kinds[v]; }
   else if (a === "layer") { S.layers[v] = !S.layers[v]; }
+  else if (a === "basemap") { S.basemap = v; }
   else if (a === "edit") { S.edit = !S.edit; toast(S.edit ? "编辑模式已开启：可直接拖动地图上的对象" : "编辑模式已关闭，改动已保存在本地"); if (!S.edit) saveStore(); }
   else if (a === "drawer") { S.drawer = !S.drawer; S.more = false; }
   else if (a === "more") { S.more = !S.more; }
@@ -921,6 +930,7 @@ function applyHash() {
     if (k === "ro" || k === "readonly") S.readonly = v === "1";
     if (k === "play") S.autoplay = v === "1";
     if (k === "z") { const z = parseFloat(v); if (z >= 1 && z <= 2.5) S.zoom = z; }
+    if (k === "basemap" && (v === "simple" || v === "cad")) S.basemap = v;
     if (k === "sel" && v) {
       const [ty, val] = v.split(":");
       if (ty === "conflict") S.sel = { type: "conflict", n: val };

@@ -95,7 +95,7 @@ const POVS = [
 /* ── 平面数据 ────────────────────────────────────────────────────────── */
 const FLOORS = {
   "1F": {
-    name: "1F · Lobby + 餐厅 + 教室", en: "Ground floor", img: "assets/1F.png", w: 1413, h: 996,
+    name: "1F · Lobby + 餐厅 + 教室", en: "Ground floor", img: "assets/1F.png", imgSimple: "assets/1F_simple.png", w: 1413, h: 996,
     zones: [
       { name: "大厅 · 中庭上空", x: 400, y: 285 },
       { name: "主楼梯 · 待确认", x: 612, y: 336 },
@@ -179,7 +179,7 @@ const FLOORS = {
   },
 
   "2F": {
-    name: "2F · 教室 + 中庭挑空", en: "Second floor", img: "assets/2F.png", w: 1184, h: 1096,
+    name: "2F · 教室 + 中庭挑空", en: "Second floor", img: "assets/2F.png", imgSimple: "assets/2F_simple.png", w: 1184, h: 1096,
     /* 2F 中庭挑空：弧形范围（含弧形大楼梯），不可通行 —— 锚点由 CAD 校准 */
     void: { cx: 555, cy: 590, rx: 108, ry: 84, rot: 12, label: "中庭挑空 · 不可通行" },
     zones: [
@@ -272,5 +272,5 @@ const DEFAULT_STATE = {
   kinds: { delivery: true, clean: true, security: true, guide: true },
   layers: { flow: true, research: true, proposal: true, zones: true, docks: true, conflicts: true, doors: true },
   rate: 1, more: false, leftOpen: true, rightOpen: true, proj: false, edit: false, drawer: false,
-  readonly: false, autoplay: false, zoom: 1
+  readonly: false, autoplay: false, zoom: 1, basemap: "simple"
 };
