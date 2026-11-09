@@ -56,11 +56,13 @@ function planSVG(floorId, variant, opt) {
   const svgId = opt.id || "plan";
   const o = [];
 
-  o.push(`<svg id="${svgId}" class="plansvg" viewBox="0 0 ${F.w} ${F.h}" preserveAspectRatio="xMidYMid meet"
+  o.push(`<svg id="${svgId}" class="plansvg" viewBox="0 0 ${F.w} ${F.h}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet"
     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">`);
   o.push(svgDefs());
   o.push(`<rect width="${F.w}" height="${F.h}" fill="#FFFFFF"/>`);
-  o.push(`<image xlink:href="${F.img}" x="0" y="0" width="${F.w}" height="${F.h}" preserveAspectRatio="xMidYMid meet"/>`);
+  /* 绝对 URL + href/xlink:href 双写：Safari 对动态插入 SVG 的相对 xlink:href 会失效 */
+  const imgHref = new URL(F.img, document.baseURI).href;
+  o.push(`<image href="${imgHref}" xlink:href="${imgHref}" x="0" y="0" width="${F.w}" height="${F.h}" preserveAspectRatio="xMidYMid meet"/>`);
   o.push(`<rect width="${F.w}" height="${F.h}" fill="#FFFFFF" opacity="0.14" style="mix-blend-mode:screen"/>`);
   if (!detail) o.push('<g opacity="0.93">');
 

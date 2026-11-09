@@ -624,6 +624,21 @@ function render() {
     if (S.view === "timeline") renderTimeline(); else renderCompare();
     ensureRails(); renderLeft();
   }
+  fixSvgImages();
+}
+
+/* Safari 兼容：innerHTML 插入的 SVG <image> 属性命名空间可能不对，用 DOM API 显式补写 */
+function fixSvgImages() {
+  const XLINK = "http://www.w3.org/1999/xlink";
+  document.querySelectorAll("svg.plansvg image").forEach(im => {
+    const raw = im.getAttribute("href") || im.getAttribute("xlink:href") ||
+      im.getAttributeNS(XLINK, "href");
+    if (!raw) return;
+    let abs = raw;
+    try { abs = new URL(raw, document.baseURI).href; } catch (e) {}
+    im.setAttribute("href", abs);
+    im.setAttributeNS(XLINK, "xlink:href", abs);
+  });
 }
 
 /* ══════════════════════════════════════════════════════════════════════
